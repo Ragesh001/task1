@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up — Task1</title>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f4f2;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ── Left Panel ── */
+        .left-panel {
+            flex: 0 0 55%;
+            display: flex;
+            flex-direction: column;
+            padding: 36px 48px;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #1a1a2e;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 48px;
+        }
+
+        .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: #6c3fc4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 20px; height: 20px; fill: white; }
+
+        .welcome-heading {
+            font-size: 38px;
+            font-weight: 700;
+            color: #1a1a2e;
+            line-height: 1.15;
+            margin-bottom: 32px;
+            letter-spacing: -0.5px;
+        }
+
+        /* ── Card ── */
+        .auth-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 36px 32px;
+            max-width: 400px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        }
+
+        .auth-card h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 24px;
+        }
+
+        /* ── Form ── */
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="email"] {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1.5px solid #e0dede;
+            border-radius: 8px;
+            color: #1a1a2e;
+            background: #fafafa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #6c3fc4;
+            box-shadow: 0 0 0 3px rgba(108, 63, 196, 0.12);
+            background: #fff;
+        }
+
+        .form-group input::placeholder { color: #aaa; }
+
+        .field-error {
+            color: #d63031;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .field-error ul, .errorlist { list-style: none; padding: 0; color: #d63031; font-size: 12px; margin-top: 4px; }
+
+        .help-text {
+            font-size: 11.5px;
+            color: #888;
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+        .help-text ul { margin: 4px 0 0; padding-left: 16px; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            background: #6c3fc4;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: 0.2px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .submit-btn:hover { background: #5a33a8; }
+        .submit-btn:active { transform: scale(0.99); }
+
+        .helper-link {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .helper-link a {
+            color: #6c3fc4;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .helper-link a:hover { text-decoration: underline; }
+
+        /* ── Right Panel ── */
+        .right-panel {
+            flex: 0 0 45%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .blob-bg {
+            position: absolute;
+            top: -8%;
+            right: -12%;
+            width: 85%;
+            height: 110%;
+            background: #6c3fc4;
+            border-radius: 55% 45% 35% 65% / 60% 40% 70% 30%;
+            z-index: 0;
+        }
+
+        .blob-bg2 {
+            position: absolute;
+            bottom: -15%;
+            left: -5%;
+            width: 60%;
+            height: 70%;
+            background: #4f2d8e;
+            border-radius: 40% 60% 55% 45% / 50% 60% 40% 50%;
+            z-index: 0;
+        }
+
+        .illustration {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .signup-illustration {
+            width: 240px;
+            filter: drop-shadow(0 12px 32px rgba(0,0,0,0.18));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-14px); }
+        }
+
+        .tagline {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-align: center;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .right-panel { display: none; }
+            .left-panel { flex: 1; padding: 28px 24px; }
+            .welcome-heading { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <a class="logo" href="#">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+                </svg>
+            </div>
+            Task1
+        </a>
+
+        <h1 class="welcome-heading">Join Task1!</h1>
+
+        <div class="auth-card">
+            <h2>Create your account</h2>
+
+            <form method="post" id="signup-form">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="field-error">{{ field.errors }}</div>
+                    {% endif %}
+                    {% if field.help_text %}
+                    <div class="help-text">{{ field.help_text|safe }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="submit-btn">Create account →</button>
+            </form>
+
+            <div class="helper-link">
+                Already have an account? <a href="{% url 'login' %}">Log in</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <div class="blob-bg"></div>
+        <div class="blob-bg2"></div>
+        <div class="illustration">
+            <svg class="signup-illustration" viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg">
+                <!-- Star burst background -->
+                <circle cx="120" cy="130" r="90" fill="#fff" opacity="0.07"/>
+                <circle cx="120" cy="130" r="65" fill="#fff" opacity="0.07"/>
+                <!-- Person silhouette -->
+                <circle cx="120" cy="75" r="36" fill="#1a1a2e"/>
+                <rect x="72" y="118" width="96" height="90" rx="28" fill="#1a1a2e"/>
+                <!-- Face -->
+                <circle cx="108" cy="72" r="7" fill="#fff" opacity="0.9"/>
+                <circle cx="132" cy="72" r="7" fill="#fff" opacity="0.9"/>
+                <circle cx="110" cy="70" r="3" fill="#1a1a2e"/>
+                <circle cx="134" cy="70" r="3" fill="#1a1a2e"/>
+                <path d="M110 88 Q120 96 130 88" stroke="#e07060" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <!-- Plus / new user icon -->
+                <circle cx="175" cy="55" r="22" fill="#e07060"/>
+                <rect x="164" y="52" width="22" height="6" rx="3" fill="#fff"/>
+                <rect x="172" y="44" width="6" height="22" rx="3" fill="#fff"/>
+                <!-- Chat bubble decorations -->
+                <rect x="30" y="170" width="70" height="30" rx="10" fill="#fff" opacity="0.9"/>
+                <polygon points="45,200 58,200 51,212" fill="#fff" opacity="0.9"/>
+                <circle cx="48" cy="185" r="4" fill="#6c3fc4"/>
+                <circle cx="62" cy="185" r="4" fill="#e07060"/>
+                <circle cx="76" cy="185" r="4" fill="#6c3fc4"/>
+                <rect x="145" y="190" width="65" height="28" rx="10" fill="#fff" opacity="0.9"/>
+                <polygon points="195,190 205,190 200,178" fill="#fff" opacity="0.9"/>
+                <rect x="152" y="200" width="50" height="5" rx="2.5" fill="#ddd"/>
+                <rect x="152" y="208" width="35" height="5" rx="2.5" fill="#eee"/>
+            </svg>
+            <p class="tagline">Start chatting in seconds</p>
+        </div>
+    </div>
+
+</body>
+</html>

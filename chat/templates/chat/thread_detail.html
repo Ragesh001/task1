@@ -1,0 +1,310 @@
+{% extends 'chat/base.html' %}
+{% block title %}{{ thread.title }}{% endblock %}
+{% block content %}
+<style>
+    /* ── Chat header ── */
+    .chat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 24px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        background: #16151f;
+        flex-shrink: 0;
+    }
+
+    .chat-header-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #6c3fc4, #8b52d4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(108,63,196,0.4);
+    }
+
+    .chat-header-icon svg { width: 18px; height: 18px; fill: white; }
+
+    .chat-header-info {}
+
+    .chat-header-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #e8e6f0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 520px;
+    }
+
+    .chat-header-subtitle {
+        font-size: 11.5px;
+        color: #55526a;
+        margin-top: 1px;
+    }
+
+    /* ── Chat area ── */
+    .chat-area {
+        flex: 1;
+        overflow-y: auto;
+        padding: 28px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        scrollbar-width: thin;
+        scrollbar-color: #2e2b40 transparent;
+    }
+
+    .chat-area::-webkit-scrollbar { width: 5px; }
+    .chat-area::-webkit-scrollbar-thumb { background: #2e2b40; border-radius: 4px; }
+
+    /* ── Message row ── */
+    .msg-row {
+        display: flex;
+        padding: 4px 28px;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .msg-row.user { justify-content: flex-end; }
+    .msg-row.assistant { justify-content: flex-start; }
+
+    /* Avatar */
+    .msg-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .msg-row.user .msg-avatar {
+        background: linear-gradient(135deg, #6c3fc4, #e07060);
+        color: white;
+        order: 2;
+    }
+
+    .msg-row.assistant .msg-avatar {
+        background: linear-gradient(135deg, #1e1c2e, #2d2b50);
+        border: 1px solid rgba(108,63,196,0.3);
+        color: #9b75e8;
+        font-size: 14px;
+    }
+
+    /* Bubble */
+    .bubble {
+        max-width: 62%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .msg-row.user .bubble {
+        background: linear-gradient(135deg, #6c3fc4, #8b52d4);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 4px 16px rgba(108,63,196,0.3);
+    }
+
+    .msg-row.assistant .bubble {
+        background: #1e1c2e;
+        color: #d4d0e8;
+        border: 1px solid rgba(255,255,255,0.07);
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* ── Empty / welcome ── */
+    .chat-welcome {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        gap: 12px;
+        color: #3d3a52;
+    }
+
+    .chat-welcome-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        background: rgba(108,63,196,0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(108,63,196,0.2); }
+        50%       { box-shadow: 0 0 0 10px rgba(108,63,196,0); }
+    }
+
+    .chat-welcome-icon svg { width: 30px; height: 30px; fill: #6c3fc4; opacity: 0.7; }
+
+    .chat-welcome h3 {
+        font-size: 17px;
+        font-weight: 700;
+        color: #4a4762;
+    }
+
+    .chat-welcome p {
+        font-size: 13.5px;
+        color: #3d3a52;
+    }
+
+    /* ── Composer ── */
+    .composer {
+        flex-shrink: 0;
+        padding: 16px 24px 20px;
+        background: #0f0e17;
+        border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .composer-inner {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        max-width: 860px;
+        margin: 0 auto;
+        background: #1a1826;
+        border: 1.5px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 10px 12px 10px 16px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .composer-inner:focus-within {
+        border-color: rgba(108,63,196,0.5);
+        box-shadow: 0 0 0 3px rgba(108,63,196,0.1);
+    }
+
+    .composer textarea {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        resize: none;
+        font-size: 14.5px;
+        font-family: inherit;
+        color: #e8e6f0;
+        line-height: 1.5;
+        max-height: 160px;
+        min-height: 24px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+
+    .composer textarea::placeholder { color: #3d3a52; }
+
+    .send-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #6c3fc4, #8b52d4);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: opacity 0.15s, transform 0.1s;
+        box-shadow: 0 2px 10px rgba(108,63,196,0.4);
+    }
+
+    .send-btn:hover { opacity: 0.85; transform: scale(1.05); }
+    .send-btn:active { transform: scale(0.97); }
+    .send-btn svg { width: 16px; height: 16px; fill: white; }
+
+    .composer-hint {
+        text-align: center;
+        font-size: 11px;
+        color: #2d2b40;
+        margin-top: 8px;
+    }
+</style>
+
+<!-- Chat header -->
+<div class="chat-header">
+    <div class="chat-header-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+        </svg>
+    </div>
+    <div class="chat-header-info">
+        <div class="chat-header-title">{{ thread.title }}</div>
+        <div class="chat-header-subtitle">Task1 AI · powered by OpenRouter</div>
+    </div>
+</div>
+
+<!-- Messages -->
+<div class="chat-area" id="chat-area">
+    {% for m in chat_messages %}
+        <div class="msg-row {{ m.role }}">
+            <div class="msg-avatar">
+                {% if m.role == 'user' %}{{ user.username|first|upper }}{% else %}✦{% endif %}
+            </div>
+            <div class="bubble {{ m.role }}">{{ m.content }}</div>
+        </div>
+    {% empty %}
+        <div class="chat-welcome">
+            <div class="chat-welcome-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+                </svg>
+            </div>
+            <h3>Start the conversation</h3>
+            <p>Say hello, ask anything, and Task1 will respond.</p>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Composer -->
+<div class="composer">
+    <form method="post" id="chat-form">
+        {% csrf_token %}
+        <div class="composer-inner">
+            {{ form.content }}
+            <button type="submit" class="send-btn" title="Send">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+                </svg>
+            </button>
+        </div>
+    </form>
+    <div class="composer-hint">Press Enter to send · Shift+Enter for new line</div>
+</div>
+
+<script>
+    // Auto-scroll to bottom
+    var chatArea = document.getElementById('chat-area');
+    if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
+
+    // Enter to send
+    var textarea = document.querySelector('.composer textarea');
+    if (textarea) {
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('chat-form').submit();
+            }
+        });
+
+        // Auto-grow textarea
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+        });
+    }
+</script>
+{% endblock %}

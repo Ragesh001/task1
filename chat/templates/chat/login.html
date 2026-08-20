@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In — Task1</title>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f4f2;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ── Left Panel ── */
+        .left-panel {
+            flex: 0 0 55%;
+            display: flex;
+            flex-direction: column;
+            padding: 36px 48px;
+            min-height: 100vh;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #1a1a2e;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 60px;
+        }
+
+        .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: #6c3fc4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 20px; height: 20px; fill: white; }
+
+        .welcome-heading {
+            font-size: 38px;
+            font-weight: 700;
+            color: #1a1a2e;
+            line-height: 1.15;
+            margin-bottom: 40px;
+            letter-spacing: -0.5px;
+        }
+
+        /* ── Card ── */
+        .auth-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 36px 32px;
+            max-width: 400px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        }
+
+        .auth-card h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 24px;
+        }
+
+        /* ── Form ── */
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 7px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="email"] {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1.5px solid #e0dede;
+            border-radius: 8px;
+            color: #1a1a2e;
+            background: #fafafa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #6c3fc4;
+            box-shadow: 0 0 0 3px rgba(108, 63, 196, 0.12);
+            background: #fff;
+        }
+
+        .form-group input::placeholder { color: #aaa; }
+
+        .field-error {
+            color: #d63031;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .field-error ul { list-style: none; padding: 0; }
+        .errorlist { list-style: none; padding: 0; color: #d63031; font-size: 12px; margin-top: 4px; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            background: #6c3fc4;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: 0.2px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .submit-btn:hover { background: #5a33a8; }
+        .submit-btn:active { transform: scale(0.99); }
+
+        .helper-link {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .helper-link a {
+            color: #6c3fc4;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .helper-link a:hover { text-decoration: underline; }
+
+        /* ── Non-field errors ── */
+        .non-field-errors {
+            background: #fff0f0;
+            border: 1px solid #f5c6c6;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #c0392b;
+        }
+        .non-field-errors ul { list-style: none; padding: 0; }
+
+        /* ── Right Panel ── */
+        .right-panel {
+            flex: 0 0 45%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .blob-bg {
+            position: absolute;
+            top: -8%;
+            right: -12%;
+            width: 85%;
+            height: 110%;
+            background: #e07060;
+            border-radius: 55% 45% 35% 65% / 60% 40% 70% 30%;
+            z-index: 0;
+        }
+
+        .blob-bg2 {
+            position: absolute;
+            bottom: -15%;
+            left: -5%;
+            width: 60%;
+            height: 70%;
+            background: #c95a48;
+            border-radius: 40% 60% 55% 45% / 50% 60% 40% 50%;
+            z-index: 0;
+        }
+
+        .illustration {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .chat-illustration {
+            width: 260px;
+            filter: drop-shadow(0 12px 32px rgba(0,0,0,0.18));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-14px); }
+        }
+
+        .tagline {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-align: center;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .right-panel { display: none; }
+            .left-panel { flex: 1; padding: 28px 24px; }
+            .welcome-heading { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <a class="logo" href="#">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+                </svg>
+            </div>
+            Task1
+        </a>
+
+        <h1 class="welcome-heading">Welcome back!</h1>
+
+        <div class="auth-card">
+            <h2>Sign in to Task1</h2>
+
+            <form method="post" id="login-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="non-field-errors">
+                    <ul>
+                        {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="field-error">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="submit-btn">Continue →</button>
+            </form>
+
+            <div class="helper-link">
+                Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <div class="blob-bg"></div>
+        <div class="blob-bg2"></div>
+        <div class="illustration">
+            <svg class="chat-illustration" viewBox="0 0 260 300" xmlns="http://www.w3.org/2000/svg">
+                <!-- Body -->
+                <rect x="60" y="90" width="140" height="160" rx="30" ry="30" fill="#1a1a2e"/>
+                <!-- Head -->
+                <rect x="70" y="60" width="120" height="90" rx="20" ry="20" fill="#1a1a2e"/>
+                <!-- Screen -->
+                <rect x="82" y="72" width="96" height="66" rx="12" ry="12" fill="#2d2b55"/>
+                <!-- Eyes -->
+                <circle cx="108" cy="100" r="10" fill="#6c3fc4"/>
+                <circle cx="152" cy="100" r="10" fill="#6c3fc4"/>
+                <circle cx="111" cy="97" r="4" fill="#fff"/>
+                <circle cx="155" cy="97" r="4" fill="#fff"/>
+                <!-- Smile -->
+                <path d="M108 118 Q130 132 152 118" stroke="#e07060" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <!-- Antenna -->
+                <line x1="130" y1="60" x2="130" y2="40" stroke="#1a1a2e" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="130" cy="34" r="8" fill="#6c3fc4"/>
+                <!-- Arms -->
+                <rect x="20" y="110" width="44" height="20" rx="10" ry="10" fill="#1a1a2e"/>
+                <rect x="196" y="110" width="44" height="20" rx="10" ry="10" fill="#1a1a2e"/>
+                <!-- Legs -->
+                <rect x="88" y="238" width="28" height="42" rx="14" ry="14" fill="#1a1a2e"/>
+                <rect x="144" y="238" width="28" height="42" rx="14" ry="14" fill="#1a1a2e"/>
+                <!-- Chat bubble -->
+                <rect x="155" y="40" width="85" height="44" rx="12" fill="#fff" opacity="0.95"/>
+                <polygon points="170,84 182,84 176,96" fill="#fff" opacity="0.95"/>
+                <circle cx="176" cy="62" r="5" fill="#6c3fc4"/>
+                <circle cx="195" cy="62" r="5" fill="#e07060"/>
+                <circle cx="214" cy="62" r="5" fill="#6c3fc4"/>
+                <rect x="168" y="72" width="60" height="5" rx="2.5" fill="#ddd"/>
+            </svg>
+            <p class="tagline">Your intelligent chat companion</p>
+        </div>
+    </div>
+
+</body>
+</html>
