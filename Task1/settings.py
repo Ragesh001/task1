@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-$1_s__n&qpp%fx@**werx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ["*"] if DEBUG else ["task1-juw2owqkv-ragesh001s-projects.vercel.app", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["*"] if DEBUG else [".vercel.app", "localhost", "127.0.0.1"]
 
 
 # Application definition
