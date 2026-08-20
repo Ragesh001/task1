@@ -78,10 +78,19 @@ WSGI_APPLICATION = 'Task1.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+import sys
+
+# On Vercel (production), use /tmp which is the only writable directory.
+# Locally, use the normal db.sqlite3 path.
+if DEBUG:
+    DB_PATH = BASE_DIR / 'db.sqlite3'
+else:
+    DB_PATH = '/tmp/db.sqlite3'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DB_PATH,
     }
 }
 
