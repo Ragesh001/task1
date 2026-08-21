@@ -1,3 +1,4 @@
+import re
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
@@ -7,6 +8,19 @@ from django.http import JsonResponse
 from django.conf import settings
 from .models import ChatThread, Message
 from .forms import SignUpForm, LoginForm, MessageForm
+
+
+def clean_safety_output(text):
+    if not text:
+        return ""
+    lines = text.splitlines()
+    cleaned_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if re.match(r'^(User Safety|Response Safety|Prompt Safety|Safety Rating|Safety Evaluation|Safety)\s*:\s*(safe|unsafe|neutral|none|low|medium|high|harmful|\w+)\s*$', stripped, re.IGNORECASE):
+            continue
+        cleaned_lines.append(line)
+    return "\n".join(cleaned_lines).strip()
 
 
 def signup_view(request):
@@ -87,14 +101,16 @@ def thread_detail_view(request, thread_id):
                 {'role': m.role, 'content': m.content}
                 for m in thread.messages.all()
             ]
-
-            # Try the selected model first, then auto router and other free models
+            # Try preferred free models first, avoiding content-safety evaluator models
+            preferred_model = model if (model and 'gemini-2.0-flash-exp' not in model and 'content-safety' not in model) else 'openrouter/free'
             models_to_try = list(dict.fromkeys([
-                model or 'openrouter/free',
+                preferred_model,
+                'google/gemma-4-31b-it:free',
+                'google/gemma-4-26b-a4b-it:free',
                 'openrouter/free',
                 'liquid/lfm-2.5-2.6b:free',
-                'google/gemma-4-26b-a4b-it:free',
-                'google/gemma-4-31b-it:free',
+                'poolside/laguna-s-2.1:free',
+                'z-ai/glm-5.2:free',
             ]))
 
             bot_text = None
@@ -114,15 +130,20 @@ def thread_detail_view(request, thread_id):
                     )
                     if res.status_code == 200:
                         data = res.json()
-                        bot_text = data['choices'][0]['message']['content']
-                        break
+                        raw_content = data['choices'][0]['message']['content']
+                        cleaned_content = clean_safety_output(raw_content)
+                        if cleaned_content:
+                            bot_text = cleaned_content
+                            break
+                        else:
+                            last_error = "Model returned only safety metadata."
                     else:
                         last_error = f"API Error ({res.status_code}): {res.text}"
                 except Exception as e:
                     last_error = f"Error communicating with AI: {str(e)}"
 
             if bot_text is None:
-                bot_text = last_error
+                bot_text = last_error if "API Error" in last_error else "I was unable to generate a response. Please try again."
 
             Message.objects.create(thread=thread, role='assistant', content=bot_text)
 
