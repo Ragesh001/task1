@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
-load_dotenv()
+from pathlib import Path as _Path
+load_dotenv(_Path(__file__).resolve().parent.parent / '.env', override=True)
 
 """
 Django settings for Task1 project.
