@@ -26,6 +26,17 @@ def login_view(request):
         return redirect('thread_list')
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
+        # If input looks like an email, find the matching username
+        identifier = request.POST.get('username', '').strip()
+        if '@' in identifier:
+            try:
+                user_obj = User.objects.get(email=identifier)
+                # Replace the POST data username with the actual username
+                data = request.POST.copy()
+                data['username'] = user_obj.username
+                form = LoginForm(request, data=data)
+            except User.DoesNotExist:
+                pass  # Let form handle the invalid login error
         if form.is_valid():
             user = form.get_user()
             login(request, user)

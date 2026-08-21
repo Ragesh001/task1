@@ -5,9 +5,9 @@ from django.contrib.auth.models import User
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
-        label='Username',
+        label='Username or Email',
         widget=forms.TextInput(attrs={
-            'placeholder': 'Enter your username',
+            'placeholder': 'Enter your username or email',
             'autofocus': True,
         }),
     )
@@ -21,12 +21,18 @@ class LoginForm(AuthenticationForm):
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(
-        required=False,
-        label='Email (optional)',
+        required=True,
+        label='Email',
         widget=forms.EmailInput(attrs={
             'placeholder': 'you@example.com',
         }),
     )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('This email is already registered.')
+        return email
 
     class Meta:
         model = User
