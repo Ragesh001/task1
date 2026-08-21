@@ -65,6 +65,8 @@ def thread_detail_view(request, thread_id):
             headers = {
                 'Authorization': f'Bearer {api_key}',
                 'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://task1.vercel.app',
+                'X-Title': 'Task1 Chat App',
             }
 
             messages_payload = [
@@ -75,6 +77,9 @@ def thread_detail_view(request, thread_id):
             payload = {
                 'model': model,
                 'messages': messages_payload,
+                'provider': {
+                    'ignore': ['Nvidia'],   # Avoid Nvidia which returns 404s
+                },
             }
 
             try:
