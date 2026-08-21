@@ -85,35 +85,41 @@ def thread_detail_view(request, thread_id):
                 for m in thread.messages.all()
             ]
 
-            # List of models/fallbacks to ensure high availability
-            fallback_models = [
-                model,
+            # Try the selected model first, then auto router and other free models
+            models_to_try = list(dict.fromkeys([
+                model or 'openrouter/free',
                 'openrouter/free',
+                'liquid/lfm-2.5-2.6b:free',
                 'google/gemma-4-26b-a4b-it:free',
                 'google/gemma-4-31b-it:free',
-                'liquid/lfm-2.5-2.6b:free',
-            ]
-            models_to_try = list(dict.fromkeys([m for m in fallback_models if m]))
+            ]))
 
-            payload = {
-                'models': models_to_try,
-                'messages': messages_payload,
-            }
+            bot_text = None
+            last_error = "Unknown error"
 
-            try:
-                res = requests.post(
-                    'https://openrouter.ai/api/v1/chat/completions',
-                    json=payload,
-                    headers=headers,
-                    timeout=30,
-                )
-                if res.status_code == 200:
-                    data = res.json()
-                    bot_text = data['choices'][0]['message']['content']
-                else:
-                    bot_text = f"API Error ({res.status_code}): {res.text}"
-            except Exception as e:
-                bot_text = f"Error communicating with AI: {str(e)}"
+            for candidate_model in models_to_try:
+                try:
+                    payload = {
+                        'model': candidate_model,
+                        'messages': messages_payload,
+                    }
+                    res = requests.post(
+                        'https://openrouter.ai/api/v1/chat/completions',
+                        json=payload,
+                        headers=headers,
+                        timeout=25,
+                    )
+                    if res.status_code == 200:
+                        data = res.json()
+                        bot_text = data['choices'][0]['message']['content']
+                        break
+                    else:
+                        last_error = f"API Error ({res.status_code}): {res.text}"
+                except Exception as e:
+                    last_error = f"Error communicating with AI: {str(e)}"
+
+            if bot_text is None:
+                bot_text = last_error
 
             Message.objects.create(thread=thread, role='assistant', content=bot_text)
             return redirect('thread_detail', thread_id=thread.id)
