@@ -2,17 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sign Up — Task1</title>
 
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        :root {
+            --sat: env(safe-area-inset-top, 0px);
+            --sab: env(safe-area-inset-bottom, 0px);
+        }
+
         body {
-            font-family: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: #f5f4f2;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* ── Left Panel ── */
@@ -20,9 +27,11 @@
             flex: 0 0 55%;
             display: flex;
             flex-direction: column;
-            padding: 36px 48px;
+            padding: calc(36px + var(--sat)) 48px calc(36px + var(--sab));
             min-height: 100vh;
+            min-height: 100dvh;
             overflow-y: auto;
+            justify-content: center;
         }
 
         .logo {
@@ -33,7 +42,7 @@
             color: #1a1a2e;
             font-weight: 700;
             font-size: 18px;
-            margin-bottom: 48px;
+            margin-bottom: 32px;
         }
 
         .logo-icon {
@@ -49,11 +58,11 @@
         .logo-icon svg { width: 20px; height: 20px; fill: white; }
 
         .welcome-heading {
-            font-size: 38px;
+            font-size: 34px;
             font-weight: 700;
             color: #1a1a2e;
             line-height: 1.15;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
             letter-spacing: -0.5px;
         }
 
@@ -61,8 +70,9 @@
         .auth-card {
             background: #ffffff;
             border-radius: 16px;
-            padding: 36px 32px;
-            max-width: 400px;
+            padding: 32px 28px;
+            max-width: 420px;
+            width: 100%;
             box-shadow: 0 4px 24px rgba(0,0,0,0.07);
         }
 
@@ -70,7 +80,7 @@
             font-size: 20px;
             font-weight: 700;
             color: #1a1a2e;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         /* ── Form ── */
@@ -79,7 +89,7 @@
         .form-group label {
             display: block;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             color: #444;
             margin-bottom: 6px;
         }
@@ -88,8 +98,8 @@
         .form-group input[type="password"],
         .form-group input[type="email"] {
             width: 100%;
-            padding: 11px 14px;
-            font-size: 14px;
+            padding: 12px 14px;
+            font-size: 15px;
             font-family: inherit;
             border: 1.5px solid #e0dede;
             border-radius: 8px;
@@ -116,7 +126,7 @@
 
         .help-text {
             font-size: 11.5px;
-            color: #888;
+            color: #777;
             margin-top: 5px;
             line-height: 1.5;
         }
@@ -124,7 +134,7 @@
 
         .submit-btn {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             margin-top: 8px;
             background: #6c3fc4;
             color: #fff;
@@ -144,7 +154,7 @@
         .helper-link {
             text-align: center;
             margin-top: 18px;
-            font-size: 13px;
+            font-size: 13.5px;
             color: #666;
         }
 
@@ -220,8 +230,29 @@
 
         @media (max-width: 768px) {
             .right-panel { display: none; }
-            .left-panel { flex: 1; padding: 28px 24px; }
-            .welcome-heading { font-size: 28px; }
+            .left-panel {
+                flex: 1;
+                padding: calc(24px + var(--sat)) 20px calc(24px + var(--sab));
+                justify-content: flex-start;
+                align-items: center;
+            }
+            .logo { margin-bottom: 20px; align-self: flex-start; }
+            .welcome-heading {
+                font-size: 26px;
+                margin-bottom: 18px;
+                align-self: flex-start;
+            }
+            .auth-card {
+                padding: 24px 20px;
+                max-width: 100%;
+                border-radius: 14px;
+            }
+            .form-group input[type="text"],
+            .form-group input[type="password"],
+            .form-group input[type="email"] {
+                font-size: 16px; /* Prevents auto-zoom in iOS Safari */
+                padding: 12px 14px;
+            }
         }
     </style>
 </head>

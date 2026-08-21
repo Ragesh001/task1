@@ -6,36 +6,68 @@
     .chat-header {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 12px;
-        padding: 14px 24px;
+        padding: calc(12px + var(--sat)) 16px 12px;
         border-bottom: 1px solid rgba(255,255,255,0.06);
         background: #16151f;
         flex-shrink: 0;
+        z-index: 10;
+    }
+
+    .chat-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .mobile-menu-btn {
+        display: none;
+        background: rgba(255,255,255,0.06);
+        border: none;
+        color: #e8e6f0;
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: background 0.15s;
+    }
+
+    .mobile-menu-btn:hover, .mobile-menu-btn:active {
+        background: rgba(255,255,255,0.12);
     }
 
     .chat-header-icon {
         width: 34px;
         height: 34px;
-        border-radius: 10px;
+        border-radius: 9px;
         background: linear-gradient(135deg, #6c3fc4, #8b52d4);
         display: flex;
         align-items: center;
         justify-content: center;
         box-shadow: 0 2px 10px rgba(108,63,196,0.4);
+        flex-shrink: 0;
     }
 
-    .chat-header-icon svg { width: 18px; height: 18px; fill: white; }
+    .chat-header-icon svg { width: 17px; height: 17px; fill: white; }
 
-    .chat-header-info {}
+    .chat-header-info {
+        min-width: 0;
+        flex: 1;
+    }
 
     .chat-header-title {
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 700;
         color: #e8e6f0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 520px;
     }
 
     .chat-header-subtitle {
@@ -44,14 +76,41 @@
         margin-top: 1px;
     }
 
+    .chat-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .mobile-new-btn {
+        display: none;
+        background: rgba(108,63,196,0.2);
+        border: 1px solid rgba(108,63,196,0.4);
+        color: #d4c8ff;
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+    }
+
+    .mobile-new-btn:hover, .mobile-new-btn:active {
+        background: #6c3fc4;
+        color: #fff;
+    }
+
     /* ── Chat area ── */
     .chat-area {
         flex: 1;
         overflow-y: auto;
-        padding: 28px 0;
+        -webkit-overflow-scrolling: touch;
+        padding: 20px 0;
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 8px;
         scrollbar-width: thin;
         scrollbar-color: #2e2b40 transparent;
     }
@@ -62,9 +121,10 @@
     /* ── Message row ── */
     .msg-row {
         display: flex;
-        padding: 4px 28px;
-        gap: 12px;
+        padding: 4px 20px;
+        gap: 10px;
         align-items: flex-start;
+        width: 100%;
     }
 
     .msg-row.user { justify-content: flex-end; }
@@ -99,10 +159,10 @@
 
     /* Bubble */
     .bubble {
-        max-width: 62%;
+        max-width: 70%;
         padding: 12px 16px;
         border-radius: 16px;
-        font-size: 14px;
+        font-size: 14.5px;
         line-height: 1.6;
         white-space: pre-wrap;
         word-break: break-word;
@@ -112,7 +172,7 @@
         background: linear-gradient(135deg, #6c3fc4, #8b52d4);
         color: #fff;
         border-bottom-right-radius: 4px;
-        box-shadow: 0 4px 16px rgba(108,63,196,0.3);
+        box-shadow: 0 3px 14px rgba(108,63,196,0.3);
     }
 
     .msg-row.assistant .bubble {
@@ -130,8 +190,10 @@
         align-items: center;
         justify-content: center;
         height: 100%;
+        padding: 30px 20px;
         gap: 12px;
         color: #3d3a52;
+        text-align: center;
     }
 
     .chat-welcome-icon {
@@ -155,20 +217,25 @@
     .chat-welcome h3 {
         font-size: 17px;
         font-weight: 700;
-        color: #4a4762;
+        color: #b8b4d0;
     }
 
     .chat-welcome p {
         font-size: 13.5px;
-        color: #3d3a52;
+        color: #55526a;
+        max-width: 300px;
     }
 
     /* ── Composer ── */
     .composer {
         flex-shrink: 0;
-        padding: 16px 24px 20px;
+        padding: 12px 16px calc(12px + var(--sab));
         background: #0f0e17;
         border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .composer form {
+        width: 100%;
     }
 
     .composer-inner {
@@ -180,13 +247,13 @@
         background: #1a1826;
         border: 1.5px solid rgba(255,255,255,0.08);
         border-radius: 14px;
-        padding: 10px 12px 10px 16px;
+        padding: 8px 10px 8px 14px;
         transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .composer-inner:focus-within {
-        border-color: rgba(108,63,196,0.5);
-        box-shadow: 0 0 0 3px rgba(108,63,196,0.1);
+        border-color: rgba(108,63,196,0.6);
+        box-shadow: 0 0 0 3px rgba(108,63,196,0.15);
     }
 
     .composer textarea {
@@ -195,21 +262,23 @@
         border: none;
         outline: none;
         resize: none;
-        font-size: 14.5px;
+        font-size: 15px;
         font-family: inherit;
         color: #e8e6f0;
-        line-height: 1.5;
-        max-height: 160px;
+        line-height: 1.45;
+        max-height: 140px;
         min-height: 24px;
+        padding: 4px 0;
         overflow-y: auto;
         scrollbar-width: thin;
     }
 
-    .composer textarea::placeholder { color: #3d3a52; }
+    .composer textarea::placeholder { color: #55526a; }
 
     .send-btn {
-        width: 36px;
-        height: 36px;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
         border-radius: 10px;
         background: linear-gradient(135deg, #6c3fc4, #8b52d4);
         border: none;
@@ -222,27 +291,107 @@
         box-shadow: 0 2px 10px rgba(108,63,196,0.4);
     }
 
-    .send-btn:hover { opacity: 0.85; transform: scale(1.05); }
-    .send-btn:active { transform: scale(0.97); }
+    .send-btn:hover { opacity: 0.9; transform: scale(1.03); }
+    .send-btn:active { transform: scale(0.96); }
     .send-btn svg { width: 16px; height: 16px; fill: white; }
 
     .composer-hint {
         text-align: center;
         font-size: 11px;
-        color: #2d2b40;
-        margin-top: 8px;
+        color: #44415a;
+        margin-top: 6px;
+    }
+
+    /* ── Mobile Layout (< 768px) ── */
+    @media (max-width: 768px) {
+        .mobile-menu-btn {
+            display: flex;
+        }
+
+        .mobile-new-btn {
+            display: flex;
+        }
+
+        .chat-header {
+            padding: calc(10px + var(--sat)) 12px 10px;
+        }
+
+        .chat-header-title {
+            font-size: 14px;
+        }
+
+        .chat-area {
+            padding: 14px 0;
+            gap: 6px;
+        }
+
+        .msg-row {
+            padding: 3px 10px;
+            gap: 8px;
+        }
+
+        .msg-avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 11px;
+        }
+
+        .bubble {
+            max-width: 86%;
+            font-size: 14px;
+            padding: 10px 14px;
+            border-radius: 14px;
+        }
+
+        .composer {
+            padding: 8px 10px calc(8px + var(--sab));
+        }
+
+        .composer-inner {
+            padding: 6px 8px 6px 12px;
+            border-radius: 12px;
+        }
+
+        /* 16px prevents iOS zoom on focus */
+        .composer textarea {
+            font-size: 16px;
+            max-height: 110px;
+        }
+
+        .composer-hint {
+            display: none;
+        }
     }
 </style>
 
 <!-- Chat header -->
 <div class="chat-header">
-    <div class="chat-header-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
-        </svg>
+    <div class="chat-header-left">
+        <button class="mobile-menu-btn" type="button" onclick="toggleSidebar(true)" aria-label="Open chat list">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+        <div class="chat-header-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+            </svg>
+        </div>
+        <div class="chat-header-info">
+            <div class="chat-header-title">{{ thread.title }}</div>
+        </div>
     </div>
-    <div class="chat-header-info">
-        <div class="chat-header-title">{{ thread.title }}</div>
+    <div class="chat-header-actions">
+        <form method="post" action="{% url 'thread_list' %}">
+            {% csrf_token %}
+            <button type="submit" class="mobile-new-btn" title="New Chat" aria-label="New Chat">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+            </button>
+        </form>
     </div>
 </div>
 
@@ -263,7 +412,7 @@
                 </svg>
             </div>
             <h3>Start the conversation</h3>
-            <p>Say hello, ask anything, and Task1 will respond.</p>
+            <p>Say hello or ask anything to get started.</p>
         </div>
     {% endfor %}
 </div>
@@ -274,7 +423,7 @@
         {% csrf_token %}
         <div class="composer-inner">
             {{ form.content }}
-            <button type="submit" class="send-btn" title="Send">
+            <button type="submit" class="send-btn" title="Send" aria-label="Send message">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
                 </svg>
@@ -287,22 +436,41 @@
 <script>
     // Auto-scroll to bottom
     var chatArea = document.getElementById('chat-area');
-    if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
+    if (chatArea) {
+        chatArea.scrollTop = chatArea.scrollHeight;
+        // Also scroll after images or fonts load
+        window.addEventListener('load', function() {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        });
+    }
 
-    // Enter to send
+    // Keydown handler
     var textarea = document.querySelector('.composer textarea');
     if (textarea) {
+        textarea.setAttribute('placeholder', 'Type a message...');
+        
+        // Auto-focus on desktop, but avoid jarring virtual keyboard pop on some mobile browsers unless tapped
+        if (window.innerWidth > 768) {
+            textarea.focus();
+        }
+
         textarea.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                document.getElementById('chat-form').submit();
+                // On desktop, enter sends
+                if (window.innerWidth > 768) {
+                    e.preventDefault();
+                    if (this.value.trim().length > 0) {
+                        document.getElementById('chat-form').submit();
+                    }
+                }
             }
         });
 
         // Auto-grow textarea
         textarea.addEventListener('input', function() {
             this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+            var maxHeight = window.innerWidth <= 768 ? 110 : 140;
+            this.style.height = Math.min(this.scrollHeight, maxHeight) + 'px';
         });
     }
 </script>

@@ -1,12 +1,87 @@
 {% extends 'chat/base.html' %}
-{% block title %}Task1{% endblock %}
+{% block title %}Task1 — AI Assistant{% endblock %}
 {% block content %}
+<style>
+    .mobile-topbar {
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        padding: calc(12px + var(--sat)) 16px 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        background: #16151f;
+        flex-shrink: 0;
+    }
+
+    .mobile-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .mobile-topbar-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #f0eeff;
+    }
+
+    .mobile-menu-trigger {
+        background: rgba(255,255,255,0.06);
+        border: none;
+        color: #e8e6f0;
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+        .mobile-topbar {
+            display: flex;
+        }
+    }
+</style>
+
+<div class="mobile-topbar">
+    <div class="mobile-topbar-left">
+        <button class="mobile-menu-trigger" type="button" onclick="toggleSidebar(true)" aria-label="Open chat history">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+        <span class="mobile-topbar-title">Task1</span>
+    </div>
+</div>
+
 <div class="empty-state">
     <div class="empty-state-icon">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
         </svg>
     </div>
-    <p>Select a chat or start a new one</p>
+    <p>Select an existing chat or start a fresh conversation with Task1.</p>
+
+    <div class="empty-state-actions">
+        <form method="post" action="{% url 'thread_list' %}" style="width: 100%;">
+            {% csrf_token %}
+            <button type="submit" class="empty-state-btn primary">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Start New Chat
+            </button>
+        </form>
+
+        <button type="button" class="empty-state-btn secondary" onclick="toggleSidebar(true)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Recent Chats
+        </button>
+    </div>
 </div>
 {% endblock %}
