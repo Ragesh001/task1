@@ -85,12 +85,19 @@ def thread_detail_view(request, thread_id):
                 for m in thread.messages.all()
             ]
 
+            # List of models/fallbacks to ensure high availability
+            fallback_models = [
+                model,
+                'openrouter/free',
+                'google/gemma-4-26b-a4b-it:free',
+                'google/gemma-4-31b-it:free',
+                'liquid/lfm-2.5-2.6b:free',
+            ]
+            models_to_try = list(dict.fromkeys([m for m in fallback_models if m]))
+
             payload = {
-                'model': model,
+                'models': models_to_try,
                 'messages': messages_payload,
-                'provider': {
-                    'ignore': ['Nvidia'],   # Avoid Nvidia which returns 404s
-                },
             }
 
             try:

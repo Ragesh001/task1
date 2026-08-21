@@ -151,7 +151,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # --- OpenRouter (LLM) settings ---
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
-OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'google/gemma-4-26b-a4b-it:free')
+OPENROUTER_MODEL = os.environ.get('OPENROUTER_MODEL', 'openrouter/free')
 
 # --- Auth redirects ---
 LOGIN_URL = 'login'
