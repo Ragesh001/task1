@@ -78,21 +78,36 @@ WSGI_APPLICATION = 'Task1.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-import sys
+import dj_database_url
 
-# On Vercel (production), use /tmp which is the only writable directory.
-# Locally, use the normal db.sqlite3 path.
-if DEBUG:
-    DB_PATH = BASE_DIR / 'db.sqlite3'
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL and DATABASE_URL.startswith(('postgresql://', 'postgres://')):
+    # Production: NeonDB (PostgreSQL) on Vercel
+    try:
+        DATABASES = {
+            'default': dj_database_url.parse(
+                DATABASE_URL,
+                conn_max_age=600,
+                ssl_require=True
+            )
+        }
+    except Exception:
+        # Fallback to SQLite if URL is malformed
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 else:
-    DB_PATH = '/tmp/db.sqlite3'
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DB_PATH,
+    # Local development: SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 
 # Password validation
