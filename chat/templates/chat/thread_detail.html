@@ -70,12 +70,6 @@
         text-overflow: ellipsis;
     }
 
-    .chat-header-subtitle {
-        font-size: 11.5px;
-        color: #55526a;
-        margin-top: 1px;
-    }
-
     .chat-header-actions {
         display: flex;
         align-items: center;
@@ -113,6 +107,7 @@
         gap: 8px;
         scrollbar-width: thin;
         scrollbar-color: #2e2b40 transparent;
+        scroll-behavior: smooth;
     }
 
     .chat-area::-webkit-scrollbar { width: 5px; }
@@ -125,6 +120,12 @@
         gap: 10px;
         align-items: flex-start;
         width: 100%;
+        animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
     .msg-row.user { justify-content: flex-end; }
@@ -181,6 +182,55 @@
         border: 1px solid rgba(255,255,255,0.07);
         border-bottom-left-radius: 4px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* ── Thinking / Loading Indicator ── */
+    .loading-bubble {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #1e1c2e;
+        border: 1px solid rgba(108,63,196,0.35);
+        padding: 12px 18px;
+        border-radius: 16px;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+
+    .typing-dots {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .typing-dots span {
+        width: 6px;
+        height: 6px;
+        background: #9b75e8;
+        border-radius: 50%;
+        display: inline-block;
+        animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0s; }
+
+    @keyframes typingBounce {
+        0%, 80%, 100% {
+            transform: scale(0.6);
+            opacity: 0.35;
+        }
+        40% {
+            transform: scale(1.15);
+            opacity: 1;
+        }
+    }
+
+    .thinking-text {
+        font-size: 13.5px;
+        color: #b8b4d0;
+        font-weight: 500;
     }
 
     /* ── Empty / welcome ── */
@@ -273,6 +323,11 @@
         scrollbar-width: thin;
     }
 
+    .composer textarea:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
     .composer textarea::placeholder { color: #55526a; }
 
     .send-btn {
@@ -293,6 +348,11 @@
 
     .send-btn:hover { opacity: 0.9; transform: scale(1.03); }
     .send-btn:active { transform: scale(0.96); }
+    .send-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
     .send-btn svg { width: 16px; height: 16px; fill: white; }
 
     .composer-hint {
@@ -380,7 +440,7 @@
             </svg>
         </div>
         <div class="chat-header-info">
-            <div class="chat-header-title">{{ thread.title }}</div>
+            <div class="chat-header-title" id="header-thread-title">{{ thread.title }}</div>
         </div>
     </div>
     <div class="chat-header-actions">
@@ -405,7 +465,7 @@
             <div class="bubble {{ m.role }}">{{ m.content }}</div>
         </div>
     {% empty %}
-        <div class="chat-welcome">
+        <div class="chat-welcome" id="chat-welcome">
             <div class="chat-welcome-icon">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
@@ -423,7 +483,7 @@
         {% csrf_token %}
         <div class="composer-inner">
             {{ form.content }}
-            <button type="submit" class="send-btn" title="Send" aria-label="Send message">
+            <button type="submit" class="send-btn" id="send-button" title="Send" aria-label="Send message">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
                 </svg>
@@ -434,43 +494,165 @@
 </div>
 
 <script>
-    // Auto-scroll to bottom
+    var userInitial = "{{ user.username|first|upper|default:'U' }}";
     var chatArea = document.getElementById('chat-area');
-    if (chatArea) {
-        chatArea.scrollTop = chatArea.scrollHeight;
-        // Also scroll after images or fonts load
-        window.addEventListener('load', function() {
+    var form = document.getElementById('chat-form');
+    var textarea = document.querySelector('.composer textarea');
+    var sendButton = document.getElementById('send-button');
+    var headerTitle = document.getElementById('header-thread-title');
+
+    function scrollToBottom() {
+        if (chatArea) {
             chatArea.scrollTop = chatArea.scrollHeight;
-        });
+        }
     }
 
-    // Keydown handler
-    var textarea = document.querySelector('.composer textarea');
+    // Initial scroll
+    scrollToBottom();
+    window.addEventListener('load', scrollToBottom);
+
+    function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     if (textarea) {
         textarea.setAttribute('placeholder', 'Type a message...');
         
-        // Auto-focus on desktop, but avoid jarring virtual keyboard pop on some mobile browsers unless tapped
         if (window.innerWidth > 768) {
             textarea.focus();
         }
-
-        textarea.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                // On desktop, enter sends
-                if (window.innerWidth > 768) {
-                    e.preventDefault();
-                    if (this.value.trim().length > 0) {
-                        document.getElementById('chat-form').submit();
-                    }
-                }
-            }
-        });
 
         // Auto-grow textarea
         textarea.addEventListener('input', function() {
             this.style.height = 'auto';
             var maxHeight = window.innerWidth <= 768 ? 110 : 140;
             this.style.height = Math.min(this.scrollHeight, maxHeight) + 'px';
+        });
+
+        // Keydown handler
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                if (window.innerWidth > 768) {
+                    e.preventDefault();
+                    submitMessage();
+                }
+            }
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitMessage();
+        });
+    }
+
+    var isSubmitting = false;
+
+    function submitMessage() {
+        if (isSubmitting || !textarea) return;
+        var messageText = textarea.value.trim();
+        if (!messageText) return;
+
+        isSubmitting = true;
+
+        // 1. Immediately clear prompt from typing space
+        textarea.value = '';
+        textarea.style.height = 'auto';
+        sendButton.disabled = true;
+
+        // 2. Hide welcome placeholder if present
+        var welcome = document.getElementById('chat-welcome');
+        if (welcome) {
+            welcome.remove();
+        }
+
+        // 3. Immediately render user's message in chat space
+        var userRow = document.createElement('div');
+        userRow.className = 'msg-row user';
+        userRow.innerHTML = 
+            '<div class="msg-avatar">' + escapeHtml(userInitial) + '</div>' +
+            '<div class="bubble user">' + escapeHtml(messageText) + '</div>';
+        chatArea.appendChild(userRow);
+
+        // 4. Immediately render AI loading / thinking indicator
+        var thinkingRow = document.createElement('div');
+        thinkingRow.className = 'msg-row assistant';
+        thinkingRow.id = 'thinking-indicator';
+        thinkingRow.innerHTML = 
+            '<div class="msg-avatar">✦</div>' +
+            '<div class="bubble assistant loading-bubble">' +
+                '<div class="typing-dots">' +
+                    '<span></span><span></span><span></span>' +
+                '</div>' +
+                '<span class="thinking-text">Task1 is thinking...</span>' +
+            '</div>';
+        chatArea.appendChild(thinkingRow);
+
+        scrollToBottom();
+
+        // 5. Send message via Fetch (AJAX)
+        var formData = new FormData(form);
+        // Ensure content is populated in form data
+        formData.set('content', messageText);
+
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Server returned ' + response.status);
+            }
+            return response.json();
+        })
+        .then(function(data) {
+            // Remove loading indicator
+            var indicator = document.getElementById('thinking-indicator');
+            if (indicator) indicator.remove();
+
+            // Render AI assistant response
+            var assistantRow = document.createElement('div');
+            assistantRow.className = 'msg-row assistant';
+            assistantRow.innerHTML = 
+                '<div class="msg-avatar">✦</div>' +
+                '<div class="bubble assistant">' + escapeHtml(data.assistant_message || 'No response') + '</div>';
+            chatArea.appendChild(assistantRow);
+
+            if (data.thread_title && headerTitle) {
+                headerTitle.textContent = data.thread_title;
+                document.title = data.thread_title + ' — Task1';
+            }
+
+            scrollToBottom();
+        })
+        .catch(function(err) {
+            console.error('Chat error:', err);
+            var indicator = document.getElementById('thinking-indicator');
+            if (indicator) indicator.remove();
+
+            var errorRow = document.createElement('div');
+            errorRow.className = 'msg-row assistant';
+            errorRow.innerHTML = 
+                '<div class="msg-avatar">✦</div>' +
+                '<div class="bubble assistant" style="color: #e07060; border-color: rgba(224,112,96,0.3);">' +
+                    'Error receiving response. Please check your connection and try again.' +
+                '</div>';
+            chatArea.appendChild(errorRow);
+            scrollToBottom();
+        })
+        .finally(function() {
+            isSubmitting = false;
+            sendButton.disabled = false;
+            if (window.innerWidth > 768) {
+                textarea.focus();
+            }
         });
     }
 </script>

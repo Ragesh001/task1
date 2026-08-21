@@ -1,7 +1,9 @@
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.conf import settings
 from .models import ChatThread, Message
 from .forms import SignUpForm, LoginForm, MessageForm
@@ -61,6 +63,7 @@ def thread_detail_view(request, thread_id):
     threads = ChatThread.objects.filter(user=request.user)
 
     if request.method == 'POST':
+        is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', '')
         form = MessageForm(request.POST)
         if form.is_valid():
             user_text = form.cleaned_data['content']
@@ -122,7 +125,19 @@ def thread_detail_view(request, thread_id):
                 bot_text = last_error
 
             Message.objects.create(thread=thread, role='assistant', content=bot_text)
+
+            if is_ajax:
+                return JsonResponse({
+                    'status': 'ok',
+                    'user_message': user_text,
+                    'assistant_message': bot_text,
+                    'thread_title': thread.title,
+                })
+
             return redirect('thread_detail', thread_id=thread.id)
+        else:
+            if is_ajax:
+                return JsonResponse({'status': 'error', 'error': 'Invalid message'}, status=400)
     else:
         form = MessageForm()
 
